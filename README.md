@@ -59,6 +59,12 @@ models. Below are the available commands and their descriptions:
   gh_copilot_rs explain <command>
   ```
 
+  Example:
+
+  ```bash
+  gh_copilot_rs explain "git reset --soft HEAD~1\n git rm mistake.md\n git commit -c ORIG_HEAD"
+  ```
+
   Replace <command> with the command you want to explain.
 
 - `suggest`: Provides recommendations for commands based on a provided input query.

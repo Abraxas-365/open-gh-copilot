@@ -9,13 +9,12 @@ const PROMPT: &str = r#"Explain the following {{os}} command: {{command}}.
 You should explain the command using bullet points, in  markdown format.
 
 Exmaple:
-• `git reset` resets the current branch to a previous commit.
-    • `--soft` means that we keep the changes made to the files in the working directory.
-• HEAD~1 specifies that we reset to the commit one before the current one.
-• `git rm` removes a file from Git.
-    • `mistake.md` is the name of file to be removed.
-• `git commit` creates a new commit.
-    • `-c` ORIG_HEAD specifies that we copy the commit message from the last commit.
+command: ls -la
+
+explanation:
+• `ls`  Lists the contents of a directory. displays the names of files and directories in the current directory.
+  • `-l` (part of `-la`) Displays the listing in long format, providing detailed information such as permissions, number of links, owner, group, size, and timestamp for each file and directory.
+  • `-a` (part of `-la`) Includes entries that start with a dot (.), showing hidden files alongside the regular listings.
 
 
 "#;
