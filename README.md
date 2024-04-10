@@ -1,12 +1,12 @@
 # Open GitHub Copilot CLI Clone
 
-Open GitHub Copilot CLI Clone is an innovative and versatile command-line interface
-(CLI) tool, inspired by the functionality of GitHub Copilot. Designed to enhance
-developer productivity through code suggestion and automation, this open-source project
-goes above and beyond by supporting a wide array of language models. Whether you're
-coding with the latest from OpenAI, benefiting from the intelligence of Anthropic's
-Claude, or utilizing local models via Ollama, this CLI tool adapts to your preferred
-coding assistant seamlessly.
+- GitHub Copilot CLI Clone: An innovative CLI tool inspired by GitHub Copilot.
+- Enhances developer productivity with code suggestions and automation.
+- Open-source and supports a broad range of language models.
+- Compatible with:
+  - `OpenAI`
+  - `Anthropic's Claude`
+  - `Local models through Ollama`
 
 # Installation Steps
 
@@ -46,6 +46,18 @@ Replace [arguments] with any arguments or flags your tool accepts.
 
 # Usage
 
+By default it uses OpenAI Gpt3.5 turbo
+
+```bash
+export OPENAI_API_KEY=sk-key
+```
+
+if you want to use your own model or config use
+
+```bash
+  gh_copilot_rs config
+```
+
 The Open GitHub Copilot CLI Clone provides a range of commands designed to assist
 developers by suggesting, explaining, and executing commands based on large language
 models. Below are the available commands and their descriptions:
@@ -80,7 +92,7 @@ models. Below are the available commands and their descriptions:
   gh_copilot_rs suggest
   ```
 
-- config: Launches an interactive configuration wizard that allows you to choose
+- `config`: Launches an interactive configuration wizard that allows you to choose
   and configure your preferred LLM provider (e.g., OpenAI, Anthropic, Ollama). This step is critical to personalize the tool according to your preferences and available services.
 
   If you dont config, it will use OpenAi gpt3.5 as default
@@ -108,3 +120,8 @@ models. Below are the available commands and their descriptions:
 
 - Revise Command: Modify the initial suggestion to better fit your requirements or
   correct any inaccuracies.
+
+# Recomendations
+
+- Move the binary to your local bin folder.
+- Rename the bin to an small command like gh-cop
