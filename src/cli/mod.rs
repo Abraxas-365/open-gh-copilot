@@ -286,6 +286,7 @@ pub async fn choose_options(shared_state: &SharedState, input: &str) {
                 .unwrap();
             println!("Explanation:\n");
             println!("{}\n", apply_styles_to_backticks(&explanation));
+            choose_options(shared_state, &input).await
         }
         3 => {
             let revised = Input::<String>::new()
