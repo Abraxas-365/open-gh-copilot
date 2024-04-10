@@ -113,7 +113,7 @@ pub fn intro() {
             .bold()
     );
     println!("{}\n",
-    style("I'm powered by AI, so surprises and mistakes are possible. Make sure to verify any g enerated code or suggestions, and share feedback so that we can learn and improve.").white().dim());
+    style("I'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.").white().dim());
 }
 
 pub fn apply_styles_to_backticks(text: &str) -> String {
