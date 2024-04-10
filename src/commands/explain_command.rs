@@ -2,7 +2,7 @@ use langchain_rust::{chain::Chain, prompt_args};
 
 use crate::{
     chains::explain_command_chain,
-    util::{apply_styles_to_backticks, shared::SharedState},
+    util::shared::{apply_styles_to_backticks, SharedState},
 };
 
 pub async fn explain_command(

@@ -1,7 +1,10 @@
 #![allow(dead_code)]
 
-use cli::{choose_model_config, init_clap};
-use util::{intro, shared::SharedState};
+use cli::init_clap;
+use util::{
+    config::LLMConfig,
+    shared::{intro, SharedState},
+};
 
 mod chains;
 mod cli;
@@ -27,7 +30,7 @@ async fn main() {
             commands::suggest_command(&shared_state, input).await;
         }
 
-        Some(("config", _)) => choose_model_config().await,
+        Some(("config", _)) => LLMConfig::new_config().await,
         _ => {
             println!("No subcommand was used");
         }

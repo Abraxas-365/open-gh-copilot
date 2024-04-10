@@ -1,43 +1,13 @@
-use std::{fs::File, io::Write, pin::Pin};
-
-use async_trait::async_trait;
-use futures::Stream;
+use dialoguer::console::{style, StyledObject};
 use langchain_rust::{
-    language_models::{llm::LLM, GenerateResult, LLMError},
     llm::{Claude, OpenAI},
-    schemas::{Message, StreamData},
     tools::OpenAIConfig,
 };
+use regex::Regex;
 
 use crate::COPILOT_PATH;
 
-use super::{AppConfig, LLMConfig};
-
-#[derive(Clone)]
-pub enum LLMVariant {
-    OpenAI(OpenAI<OpenAIConfig>),
-    Anthropic(Claude),
-}
-
-#[async_trait]
-impl LLM for LLMVariant {
-    async fn generate(&self, messages: &[Message]) -> Result<GenerateResult, LLMError> {
-        match self {
-            LLMVariant::OpenAI(llm) => llm.generate(messages).await,
-            LLMVariant::Anthropic(llm) => llm.generate(messages).await,
-        }
-    }
-
-    async fn stream(
-        &self,
-        _messages: &[Message],
-    ) -> Result<Pin<Box<dyn Stream<Item = Result<StreamData, LLMError>> + Send>>, LLMError> {
-        match self {
-            LLMVariant::OpenAI(llm) => llm.stream(_messages).await,
-            LLMVariant::Anthropic(llm) => llm.stream(_messages).await,
-        }
-    }
-}
+use super::{config::LLMConfig, llm::LLMVariant};
 
 pub struct SharedState {
     llm: LLMVariant,
@@ -66,34 +36,30 @@ impl Default for SharedState {
         let os = std::env::consts::OS;
         match read_config() {
             Some(cfg) => {
-                match cfg.llm.llm_type.as_str() {
+                match cfg.llm_type.as_str() {
                     "openai" => {
-                        println!("AAAAAAAAAAAAAAAAA");
                         let mut llm = OpenAI::default().with_config(OpenAIConfig::default());
                         let mut config = OpenAIConfig::default();
-                        if let Some(api_key) = cfg.llm.api_key {
+                        if let Some(api_key) = cfg.api_key {
                             config = config.with_api_key(api_key);
                         }
-                        if let Some(api_base) = cfg.llm.api_base {
+                        if let Some(api_base) = cfg.api_base {
                             llm = llm.with_config(config.with_api_base(api_base));
                         }
-                        if let Some(model) = cfg.llm.model {
+                        if let Some(model) = cfg.model {
                             llm = llm.with_model(&model);
                         }
                         return SharedState::new(LLMVariant::OpenAI(llm), os);
                     }
                     "ollama" => {
-                        println!("AAAAAAAAAAAAAAAAA");
                         let mut llm = OpenAI::default();
                         let mut config = OpenAIConfig::default();
-                        config =
-                            config.with_api_key(cfg.llm.api_key.unwrap_or("ollama".to_string()));
+                        config = config.with_api_key(cfg.api_key.unwrap_or("ollama".to_string()));
                         config = config.with_api_base(
-                            cfg.llm
-                                .api_base
+                            cfg.api_base
                                 .unwrap_or("http://localhost:11434/v1".to_string()),
                         );
-                        llm = llm.with_model(&cfg.llm.model.unwrap_or("llama2".to_string()));
+                        llm = llm.with_model(&cfg.model.unwrap_or("llama2".to_string()));
                         llm = llm.with_config(config);
 
                         return SharedState::new(LLMVariant::OpenAI(llm), os);
@@ -101,10 +67,10 @@ impl Default for SharedState {
 
                     "anthropic" => {
                         let mut llm = Claude::default();
-                        if let Some(api_key) = cfg.llm.api_key {
+                        if let Some(api_key) = cfg.api_key {
                             llm = llm.with_api_key(api_key);
                         }
-                        if let Some(model) = cfg.llm.model {
+                        if let Some(model) = cfg.model {
                             llm = llm.with_model(&model);
                         }
                         return SharedState::new(LLMVariant::Anthropic(llm), os);
@@ -122,7 +88,7 @@ impl Default for SharedState {
     }
 }
 
-fn read_config() -> Option<AppConfig> {
+fn read_config() -> Option<LLMConfig> {
     let mut config_path = home::home_dir()?;
     config_path.push(COPILOT_PATH);
 
@@ -135,21 +101,30 @@ fn read_config() -> Option<AppConfig> {
     if config.is_none() {
         return None;
     }
-    Some(AppConfig {
-        llm: config.unwrap(),
-    })
+    Some(config.unwrap())
 }
 
-pub fn save_config(config: &LLMConfig) -> std::io::Result<()> {
-    let toml_string = toml::to_string_pretty(&config)
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-    let mut config_path = home::home_dir().ok_or(std::io::Error::new(
-        std::io::ErrorKind::NotFound,
-        "Home directory not found",
-    ))?;
-    config_path.push(COPILOT_PATH);
+pub fn intro() {
+    println!(
+        "\n{}\n",
+        style("Welcome to GitHub Copilot in the CLI!")
+            .white()
+            .bright()
+            .bold()
+    );
+    println!("{}\n",
+    style("I'm powered by AI, so surprises and mistakes are possible. Make sure to verify any g enerated code or suggestions, and share feedback so that we can learn and improve.").white().dim());
+}
 
-    let mut file = File::create(config_path)?;
-    file.write_all(toml_string.as_bytes())?;
-    Ok(())
+pub fn apply_styles_to_backticks(text: &str) -> String {
+    let re = Regex::new(r"`([^`]*)`").unwrap();
+    let mut result_text = text.to_string();
+
+    for cap in re.captures_iter(text) {
+        let matched_text: &str = &cap[1];
+        let styled: StyledObject<String> = style(matched_text.to_string()).yellow().bold();
+        result_text = result_text.replacen(&format!("`{}`", matched_text), &styled.to_string(), 1);
+    }
+
+    result_text
 }
