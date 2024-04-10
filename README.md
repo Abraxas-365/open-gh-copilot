@@ -4,9 +4,12 @@
 - Enhances developer productivity with code suggestions and automation.
 - Open-source and supports a broad range of language models.
 - Compatible with:
+
   - `OpenAI`
   - `Anthropic's Claude`
   - `Local models through Ollama`
+
+  ![Example](https://github.com/Abraxas-365/open-gh-copilot/example.gif)
 
 # Installation Steps
 
