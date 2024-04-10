@@ -1,6 +1,6 @@
 use dialoguer::console::{style, StyledObject};
 use langchain_rust::{
-    llm::{Claude, OpenAI},
+    llm::{AzureConfig, Claude, OpenAI},
     tools::OpenAIConfig,
 };
 use regex::Regex;
@@ -74,6 +74,18 @@ impl Default for SharedState {
                             llm = llm.with_model(&model);
                         }
                         return SharedState::new(LLMVariant::Anthropic(llm), os);
+                    }
+
+                    "azure_openai" => {
+                        let azure_config = AzureConfig::default()
+                            .with_api_key(cfg.api_key.expect("Azure API key not found"))
+                            .with_api_base(cfg.api_base.expect("Azure API base not found"))
+                            .with_api_version(cfg.api_version.expect("Azure API version not found"))
+                            .with_deployment_id(
+                                cfg.deployment.expect("Azure deployment ID not found"),
+                            );
+                        let llm = OpenAI::new(azure_config);
+                        return SharedState::new(LLMVariant::AzureOpenAI(llm), os);
                     }
 
                     // Handle other LLM types here

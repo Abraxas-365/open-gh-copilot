@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use futures::Stream;
 use langchain_rust::{
     language_models::{llm::LLM, GenerateResult, LLMError},
-    llm::{Claude, OpenAI},
+    llm::{AzureConfig, Claude, OpenAI},
     schemas::{Message, StreamData},
     tools::OpenAIConfig,
 };
@@ -12,6 +12,7 @@ use langchain_rust::{
 #[derive(Clone)]
 pub enum LLMVariant {
     OpenAI(OpenAI<OpenAIConfig>),
+    AzureOpenAI(OpenAI<AzureConfig>),
     Anthropic(Claude),
 }
 
@@ -21,6 +22,7 @@ impl LLM for LLMVariant {
         match self {
             LLMVariant::OpenAI(llm) => llm.generate(messages).await,
             LLMVariant::Anthropic(llm) => llm.generate(messages).await,
+            LLMVariant::AzureOpenAI(llm) => llm.generate(messages).await,
         }
     }
 
@@ -31,6 +33,7 @@ impl LLM for LLMVariant {
         match self {
             LLMVariant::OpenAI(llm) => llm.stream(_messages).await,
             LLMVariant::Anthropic(llm) => llm.stream(_messages).await,
+            LLMVariant::AzureOpenAI(llm) => llm.stream(_messages).await,
         }
     }
 }

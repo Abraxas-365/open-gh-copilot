@@ -27,6 +27,17 @@ impl LLMConfig {
         }
     }
 
+    pub fn new_azure_openai() -> Self {
+        LLMConfig {
+            llm_type: "azure_openai".to_string(),
+            api_key: Some("REPLACE_ME_WITH_YOUR_API_KEY".to_string()),
+            api_base: Some("https://your-resource-name.openai.azure.com".to_string()),
+            api_version: Some("2024-02-15-preview".to_string()),
+            deployment: Some("chatGPT_GPT35-turbo-0301".to_string()),
+            model: Some("chatGPT_GPT35-turbo-0301".to_string()),
+        }
+    }
+
     pub fn new_openai() -> Self {
         LLMConfig {
             llm_type: "openai".to_string(),
@@ -50,7 +61,7 @@ impl LLMConfig {
     }
 
     pub async fn new_config() {
-        let opciones = vec!["OpenAi", "Ollama", "Anthropic", "Exit"];
+        let opciones = vec!["OpenAI", "Ollama", "Anthropic", "AzureOpenAI", "Exit"];
 
         let instrucciones = style("[Use arrows to move, type to filter]")
             .yellow()
@@ -146,7 +157,48 @@ impl LLMConfig {
                     .map_err(|e| eprintln!("{}", e))
                     .unwrap();
             }
-            3 => std::process::exit(0),
+            3 => {
+                let mut config = LLMConfig::new_azure_openai();
+                let model_prompt = "Enter the model/Deploiment id (press Enter for default 'chatGPT_GPT35-turbo-0301'):";
+                let model_input: String = Input::new()
+                    .with_prompt(model_prompt)
+                    .default("chatGPT_GPT35-turbo-0301".into())
+                    .interact_text()
+                    .unwrap();
+
+                let api_key_prompt = "Enter your Azure OpenAi key";
+                let api_key: String = Input::new()
+                    .with_prompt(api_key_prompt)
+                    .default("REPLACE_ME_WITH_YOUR_API_KEY".into())
+                    .interact_text()
+                    .unwrap();
+
+                let api_version_prompt =
+                    "Enter the api version (press Enter for default '2024-02-15-preview'):";
+                let api_version: String = Input::new()
+                    .with_prompt(api_version_prompt)
+                    .default("2024-02-15-preview".into())
+                    .interact_text()
+                    .unwrap();
+
+                let api_base_prompt =
+                    "Enter the base URL (press Enter for default 'https://your-resource-name.openai.azure.com'):";
+                let api_base: String = Input::new()
+                    .with_prompt(api_base_prompt)
+                    .default("https://your-resource-name.openai.azure.com".into())
+                    .interact_text()
+                    .unwrap();
+
+                config.deployment = Some(model_input);
+                config.api_key = Some(api_key);
+                config.api_version = Some(api_version);
+                config.api_base = Some(api_base);
+
+                save_config(&config)
+                    .map_err(|e| eprintln!("{}", e))
+                    .unwrap();
+            }
+            4 => std::process::exit(0),
             _ => eprintln!("Invalid option."),
         }
     }
