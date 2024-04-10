@@ -9,7 +9,9 @@
   - `Anthropic's Claude`
   - `Local models through Ollama`
 
-  ![Example](https://github.com/Abraxas-365/open-gh-copilot/example.gif)
+https://github.com/Abraxas-365/open-gh-copilot/assets/63959220/74e2b2db-ca5e-4830-9439-b637cc8d6301
+
+
 
 # Installation Steps
 
