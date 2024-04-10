@@ -4,12 +4,12 @@ use serde::{Deserialize, Serialize};
 
 pub mod shared;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
     pub llm: LLMConfig,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LLMConfig {
     pub llm_type: String,
     pub api_key: Option<String>,
@@ -17,6 +17,41 @@ pub struct LLMConfig {
     pub api_version: Option<String>,
     pub deployment: Option<String>,
     pub model: Option<String>,
+}
+
+impl LLMConfig {
+    pub fn new_ollama() -> Self {
+        LLMConfig {
+            llm_type: "ollama".to_string(),
+            api_key: Some("ollama".to_string()),
+            api_base: Some("http://localhost:11434/v1".to_string()),
+            api_version: None,
+            deployment: None,
+            model: Some("llama2".to_string()),
+        }
+    }
+
+    pub fn new_openai() -> Self {
+        LLMConfig {
+            llm_type: "openai".to_string(),
+            api_key: None,
+            api_base: None,
+            api_version: None,
+            deployment: None,
+            model: Some("gpt-3.5-turbo".to_string()),
+        }
+    }
+
+    pub fn new_anthropic() -> Self {
+        LLMConfig {
+            llm_type: "anthropic".to_string(),
+            api_key: None,
+            api_base: None,
+            api_version: None,
+            deployment: None,
+            model: Some("claude-3-opus-20240229".to_string()),
+        }
+    }
 }
 
 pub fn intro() {

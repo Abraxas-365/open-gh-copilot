@@ -1,5 +1,5 @@
 use dialoguer::console::style;
-use langchain_rust::{chain::Chain, language_models::llm::LLM, prompt_args};
+use langchain_rust::{chain::Chain, prompt_args};
 
 use crate::{
     chains::recomend_command_chain,
@@ -7,10 +7,7 @@ use crate::{
     util::shared::SharedState,
 };
 
-pub async fn suggest_command<LLMType: LLM + Clone + 'static>(
-    shared_state: &SharedState<LLMType>,
-    command: Option<&str>,
-) {
+pub async fn suggest_command(shared_state: &SharedState, command: Option<&str>) {
     let recommend_chian = recomend_command_chain(shared_state.llm());
     if let Some(input) = command {
         let suggestion = recommend_chian

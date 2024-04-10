@@ -9,9 +9,6 @@ const PROMPT: &str = r#"Explain the following {{os}} command: {{command}}.
 You should explain the command using bullet points, in  markdown format.
 
 Exmaple:
-command: git reset --soft HEAD~1 git rm mistake.md git commit -c ORIG_HEAD
-
-explanation:
 • `git reset` resets the current branch to a previous commit.
     • `--soft` means that we keep the changes made to the files in the working directory.
 • HEAD~1 specifies that we reset to the commit one before the current one.
