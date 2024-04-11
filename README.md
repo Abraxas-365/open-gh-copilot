@@ -105,13 +105,30 @@ models. Below are the available commands and their descriptions:
   gh_copilot_rs config
   ```
 
-  Follow the prompts to select your LLM provider and configure additional settings,
-  such as API keys and model preferences.
-  Additional Options for Suggestions
+- `commit`: Creates a automatic commit message of the staged files.
+  _`commit` is in testing._
 
-  After obtaining a suggestion, further actions can be performed, such as copying the
-  result to your clipboard, executing the recommended command directly, revising the
-  command, or obtaining a detailed explanation:
+  - Automaitc commit
+
+  ```bash
+  gh_copilot_rs commit
+  ```
+
+  - Excluding files and context
+    - flag `-e` are the excluded files
+    - flag `-c` is some context for the commit
+
+  ```bash
+  gh_copilot_rs commit -e excluded1.txt excluded2.txt -c "Refactored authentication module"
+  ```
+
+Follow the prompts to select your LLM provider and configure additional settings,
+such as API keys and model preferences.
+Additional Options for Suggestions
+
+After obtaining a suggestion, further actions can be performed, such as copying the
+result to your clipboard, executing the recommended command directly, revising the
+command, or obtaining a detailed explanation:
 
 - Copy to Clipboard: Quickly copy the suggested command to your clipboard for easy
   pasting into your terminal or script.
