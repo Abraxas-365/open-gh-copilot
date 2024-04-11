@@ -9,9 +9,9 @@ use langchain_rust::{chain::Chain, prompt_args};
 use crate::{
     chains::{
         explain_command_chain, recomend_command_chain, recomend_command_git_chain,
-        recomend_command_github_chain, revise_command_chain,
+        recomend_command_github_chain, revise_command_chain, revise_commit_chain,
     },
-    util::shared::{SharedState, apply_styles_to_backticks},
+    util::shared::{apply_styles_to_backticks, SharedState},
 };
 
 pub fn init_clap() -> clap::ArgMatches {
@@ -35,6 +35,27 @@ pub fn init_clap() -> clap::ArgMatches {
                 .arg(Arg::new("input").help("The input to suggest a command for")),
         )
         .subcommand(clap::Command::new("config").about("Configure your LLM provider"))
+        .subcommand(
+            clap::Command::new("commit")
+                .about("Auto Commit Message")
+                .arg(
+                    Arg::new("excluded")
+                        .long("excluded")
+                        .short('e')
+                        .help("Files or paths to exclude from the commit")
+                        .takes_value(true)
+                        .multiple_values(true)
+                        .required(false),
+                )
+                .arg(
+                    Arg::new("context")
+                        .long("context")
+                        .short('c')
+                        .help("Optional context for the commit")
+                        .takes_value(true)
+                        .required(false),
+                ),
+        )
         .get_matches()
 }
 
@@ -200,6 +221,63 @@ pub async fn choose_options(shared_state: &SharedState, input: &str) {
             choose_options(shared_state, &revised_command).await
         }
         4 => std::process::exit(0),
+
+        _ => eprintln!("Invalid option."),
+    }
+}
+
+#[async_recursion]
+pub async fn choose_options_for_commit(shared_state: &SharedState, input: &str) {
+    let opciones = vec![
+        "Copy to clipboard",
+        "Commit message",
+        "Revise  Command",
+        "Exit",
+    ];
+
+    let instrucciones = style("[Use arrows to move, type to filter]")
+        .yellow()
+        .to_string();
+    let prompt = format!("Select an option  {}", instrucciones);
+
+    let seleccion = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt(&prompt)
+        .default(0)
+        .items(&opciones[..])
+        .interact()
+        .unwrap();
+
+    match seleccion {
+        0 => {
+            let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+            ctx.set_contents(input.into()).unwrap();
+        }
+        1 => match Command::new("sh")
+            .arg("-c")
+            .arg(format!(r#"git commit -m "{}""#, input))
+            .status()
+        {
+            Ok(status) if status.success() => println!("Command executed successfully."),
+            _ => eprintln!("Error executing command."),
+        },
+        2 => {
+            let revised = Input::<String>::new()
+                .with_prompt(style("> ").blue().bold().to_string())
+                .interact()
+                .unwrap();
+            let revise_chain = revise_commit_chain(shared_state.llm());
+            let revised_command = revise_chain
+                .invoke(prompt_args! {
+                    "to"=>revised,
+                    "commit"=>input
+                })
+                .await
+                .unwrap();
+            println!("Sugestion:\n");
+            println!("{}\n", style(revised_command.clone()).yellow().bold());
+            choose_options_for_commit(shared_state, &revised_command).await
+        }
+        3 => std::process::exit(0),
 
         _ => eprintln!("Invalid option."),
     }

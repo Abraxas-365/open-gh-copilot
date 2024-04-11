@@ -31,6 +31,14 @@ async fn main() {
         }
 
         Some(("config", _)) => LLMConfig::new_config().await,
+
+        Some(("commit", args)) => {
+            let context = args.value_of("context");
+            let exclude = args.values_of("exclude").map(|v| v.collect::<Vec<&str>>());
+
+            commands::git_commit_command(&shared_state, context, exclude.as_deref()).await;
+        }
+
         _ => {
             println!("No subcommand was used");
         }
