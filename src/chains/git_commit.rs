@@ -56,7 +56,17 @@ pub fn git_commit_chain_with_context<VALUE: LLM + 'static>(llm: VALUE) -> LLMCha
 
 const PROMPT_REVISE_GIT: &str = r#"
 Giving this git commit :{{commit}}, modify it to {{to}}.
-You sould just return the commit message, nothing more.
+You sould just return the complete commit message, nothing more.
+
+Example input Commit:
+feat(parser):add ability to parse JSON files.
+
+Example To change:
+other option
+
+Example anwer:
+feat(parser):add new JSON parse function to parse files
+
 "#;
 pub fn revise_commit_chain<VALUE: LLM + 'static>(llm: VALUE) -> LLMChain {
     LLMChainBuilder::new()
